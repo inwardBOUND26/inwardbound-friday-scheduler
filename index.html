@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>inwardBOUND — WhatsApp Schedule Sender</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Arial,sans-serif;background:#f5f5f0;color:#1a1a1a;font-size:14px;}
+.header{background:#1A3A5C;color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
+.header h1{font-size:16px;font-weight:bold;}
+.header span{font-size:12px;opacity:0.7;}
+.container{max-width:1100px;margin:0 auto;padding:20px;}
+.card{background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:16px 20px;margin-bottom:16px;}
+.card h2{font-size:13px;font-weight:bold;color:#555;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.04em;}
+.top-controls{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px;}
+.field{display:flex;flex-direction:column;gap:4px;}
+.field label{font-size:11px;color:#777;font-weight:bold;text-transform:uppercase;}
+input[type=text]{font-size:13px;padding:7px 10px;border:1px solid #ccc;border-radius:6px;width:220px;}
+.btn{padding:8px 16px;font-size:13px;border:1px solid #ccc;border-radius:6px;cursor:pointer;background:#fff;transition:all 0.15s;}
+.btn:hover{background:#f0f0f0;}
+.btn-green{background:#25D366;color:#fff;border-color:#25D366;font-weight:bold;}
+.btn-green:hover{background:#1db954;}
+.btn-blue{background:#1A3A5C;color:#fff;border-color:#1A3A5C;}
+.btn-blue:hover{background:#0c2a44;}
+.grid-header{display:grid;grid-template-columns:110px 1fr 110px 70px 70px 130px 130px 130px 36px;gap:5px;font-size:11px;color:#777;font-weight:bold;text-transform:uppercase;padding:0 2px 6px;border-bottom:1px solid #eee;margin-bottom:6px;}
+.grid-row{display:grid;grid-template-columns:110px 1fr 110px 70px 70px 130px 130px 130px 36px;gap:5px;margin-bottom:5px;align-items:center;}
+.grid-row input,.grid-row select{font-size:12px;padding:5px 6px;border:1px solid #ddd;border-radius:5px;width:100%;background:#fff;}
+.grid-row input:focus,.grid-row select:focus{outline:none;border-color:#1A3A5C;}
+.del-btn{background:none;border:none;color:#bbb;cursor:pointer;font-size:18px;padding:0;line-height:1;}
+.del-btn:hover{color:#e53935;}
+.add-btn{font-size:12px;padding:5px 12px;margin-top:6px;color:#1A3A5C;border-color:#1A3A5C;}
+.trainer-card{background:#fff;border:1px solid #e0e0e0;border-radius:10px;overflow:hidden;margin-bottom:12px;}
+.trainer-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#f9f9f7;border-bottom:1px solid #eee;}
+.trainer-name{font-size:15px;font-weight:bold;color:#1A3A5C;}
+.trainer-sub{font-size:12px;color:#888;margin-top:1px;}
+.header-btns{display:flex;gap:8px;}
+.copy-btn{padding:5px 14px;font-size:12px;background:#25D366;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;}
+.copy-btn:hover{background:#1db954;}
+.copy-btn.done{background:#128C7E;}
+.wa-btn{padding:5px 14px;font-size:12px;background:#075E54;color:#fff;border:none;border-radius:6px;cursor:pointer;text-decoration:none;font-weight:bold;}
+.wa-btn:hover{background:#054d44;}
+.message-body{padding:14px 16px;font-size:13px;line-height:1.7;color:#333;white-space:pre-wrap;background:#fff;}
+.empty{text-align:center;color:#aaa;padding:32px;font-size:13px;}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;background:#E3F0FB;color:#1A3A5C;margin-left:6px;font-weight:normal;}
+.instructions{background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:12px 16px;font-size:12px;color:#555;line-height:1.6;margin-bottom:16px;}
+.instructions strong{color:#1A3A5C;}
+@media(max-width:700px){
+  .grid-header,.grid-row{grid-template-columns:1fr 1fr;gap:5px;}
+  .grid-header div:nth-child(n+3),.grid-row *:nth-child(n+4){display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>inwardBOUND — WhatsApp Schedule Sender</h1>
+  <span>Gian's Friday tool</span>
+</div>
+
+<div class="container">
+
+  <div class="instructions">
+    <strong>How to use:</strong> &nbsp;① Enter the week label → &nbsp;② Add sessions (one row per session) → &nbsp;③ Click <strong>Generate Messages</strong> → &nbsp;④ For each trainer, click <strong>Open in WhatsApp</strong> (message is pre-typed) or <strong>Copy</strong> to paste manually.
+  </div>
+
+  <div class="card">
+    <h2>Week settings</h2>
+    <div class="top-controls">
+      <div class="field">
+        <label>Week label</label>
+        <input type="text" id="week-label" value="T2W1 (23–27 Mar 2026)" placeholder="e.g. T2W1 (23–27 Mar)">
+      </div>
+      <div class="field">
+        <label>Sender name</label>
+        <input type="text" id="sender-name" value="inwardBOUND" placeholder="e.g. Gian / inwardBOUND" style="width:160px;">
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button class="btn btn-blue" onclick="generateMessages()">Generate messages</button>
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button class="btn" onclick="clearAll()">Clear all</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Sessions this week</h2>
+    <div class="grid-header">
+      <div>Date</div><div>School</div><div>Programme</div>
+      <div>Start</div><div>End</div>
+      <div>Trainer 1</div><div>Trainer 2</div><div>Trainer 3</div><div></div>
+    </div>
+    <div id="session-rows"></div>
+    <button class="btn add-btn" onclick="addRow()">+ Add session</button>
+  </div>
+
+  <div id="output"></div>
+
+</div>
+
+<script>
+const TRAINERS = ['Adeeb','Alvin','Aurora','Benjin','Biwa','Damien','Dylan','Ella','Farah','Fatin','Gopal','Haddad','Haiky','Hannan','Hashiena','Hayati','Isaiah','Jane','Jason','Kaelen','Kimberly','Matthew','Meryllyn','Naq','Nina','Pat','Phoebe','Raiya','Rebecca','Riqi','Sandy','Sonia','Su Juan','Sufian','Timothy','Veronica','Wan Ahmad','Yao Ting'];
+
+const CONTACTS = {
+  'Adeeb':'97595835','Alvin':'98170437','Aurora':'94297489','Benjin':'98766636',
+  'Biwa':'88332294','Damien':'81636286','Dylan':'96901605','Ella':'93814643',
+  'Farah':'98227806','Fatin':'81856976','Gopal':'94570325','Haddad':'98442217',
+  'Haiky':'93873634','Hannan':'92287939','Hashiena':'87152091','Hayati':'81000722',
+  'Isaiah':'96569345','Jane':'91390073','Jason':'92288139','Kimberly':'92225563',
+  'Matthew':'96955922','Meryllyn':'96963486','Naq':'93374676','Nina':'98436143',
+  'Pat':'96839081','Phoebe':'96627876','Raiya':'97738664','Rebecca':'97665233',
+  'Riqi':'83216488','Sandy':'88875278','Sonia':'96371913','Su Juan':'84398168',
+  'Sufian':'91839283','Timothy':'87490649','Veronica':'96751503','Yao Ting':'98719262'
+};
+
+const SCHOOLS = [
+  'Beatty Secondary School','Bukit Panjang Govt High School',"CHIJ St. Joseph's Convent",
+  'Clementi Town Secondary School','Fuhua Primary School','Hillgrove Secondary School',
+  'Hwa Chong Institution','Juying Secondary School','Kent Ridge Secondary School',
+  'Montfort Secondary School','Nan Chiau High School','Naval Base Primary School',
+  'North Vista Secondary School','Opera Estate Primary School','Peirce Secondary School',
+  'Serangoon Secondary School','St Hilda Primary School','Swiss Cottage Secondary School',
+  'Xinmin Secondary School','Yishun Innova Junior College','Yio Chu Kang Secondary School',
+  'Hwa Chong International School','Kuo Chuan Presbyterian Primary School',
+  'Whitley Secondary School','Jurong Secondary School','Sengkang Secondary School',
+  'Science Centre Singapore','PPIS','Casuarina Primary School','River Valley Primary School',
+  'Xishan Primary School','Blangah Rise Primary School','Chongfu School',
+  'CHIJ Primary (Toa Payoh)','CHIJ St. Nicholas Girls School','Punggol Primary School',
+];
+
+const ABBR = {
+  'Beatty Secondary School':'BTYSS','Bukit Panjang Govt High School':'BPGHS',
+  "CHIJ St. Joseph's Convent":'CHIJ SJC','Clementi Town Secondary School':'CTSS',
+  'Fuhua Primary School':'FPS','Hillgrove Secondary School':'HGSS',
+  'Hwa Chong Institution':'HCI','Juying Secondary School':'JYSS',
+  'Kent Ridge Secondary School':'KRSS','Montfort Secondary School':'MFSS',
+  'Nan Chiau High School':'NCHS','Naval Base Primary School':'NBPS',
+  'North Vista Secondary School':'NVSS','Opera Estate Primary School':'OPS',
+  'Peirce Secondary School':'PSS','Serangoon Secondary School':'SSS',
+  'St Hilda Primary School':'SHPS','Swiss Cottage Secondary School':'SCSS',
+  'Xinmin Secondary School':'XMSS','Yishun Innova Junior College':'YIJC',
+  'Yio Chu Kang Secondary School':'YCKSS','Hwa Chong International School':'HCIS',
+  'Kuo Chuan Presbyterian Primary School':'KCPS','Whitley Secondary School':'WSS',
+  'Jurong Secondary School':'JSS','Sengkang Secondary School':'Sengkang SS',
+  'Science Centre Singapore':'Science Centre','PPIS':'PPIS',
+  'Casuarina Primary School':'Casuarina Pri','River Valley Primary School':'River Valley Pri',
+  'Xishan Primary School':'Xishan Pri','Blangah Rise Primary School':'Blangah Rise Pri',
+  'CHIJ Primary (Toa Payoh)':'CHIJ Toa Payoh','CHIJ St. Nicholas Girls School':'CHIJ St. Nicks',
+  'Punggol Primary School':'Punggol Pri','Chongfu School':'Chongfu',
+};
+
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const TIMES = [];
+for(let h=6;h<=22;h++) for(let m of[0,15,30,45]){if(h===22&&m>0)break;TIMES.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);} TIMES.push('22:00');
+
+let rid = 0;
+
+function sel(opts, ph, val='') {
+  return `<select><option value="">${ph}</option>${opts.map(o=>`<option value="${o}"${o===val?' selected':''}>${o}</option>`).join('')}</select>`;
+}
+function timeSel(val='') {
+  return `<select><option value=""></option>${TIMES.map(t=>`<option value="${t}"${t===val?' selected':''}>${t}</option>`).join('')}</select>`;
+}
+
+function addRow(d={}) {
+  const id = rid++;
+  const div = document.createElement('div');
+  div.className = 'grid-row';
+  div.id = `r${id}`;
+  div.innerHTML = `
+    <input type="date" value="${d.date||''}">
+    ${sel(SCHOOLS,'Select school...',d.school||'')}
+    <select><option value="">Programme</option>${['CCA','DIC','Assembly','Special Project','Ad Hoc','SKM'].map(p=>`<option${p===d.prog?' selected':''}>${p}</option>`).join('')}</select>
+    ${timeSel(d.start||'')}
+    ${timeSel(d.end||'')}
+    ${sel(TRAINERS,'Trainer 1',d.t1||'')}
+    ${sel(TRAINERS,'Trainer 2',d.t2||'')}
+    ${sel(TRAINERS,'Trainer 3',d.t3||'')}
+    <button class="del-btn" onclick="document.getElementById('r${id}').remove()">×</button>`;
+  document.getElementById('session-rows').appendChild(div);
+}
+
+function getRows() {
+  const rows = [];
+  document.querySelectorAll('.grid-row').forEach(div => {
+    const i = div.querySelectorAll('input,select');
+    const school = i[1].value, t1=i[5].value, t2=i[6].value, t3=i[7].value;
+    if(school && (t1||t2||t3)) rows.push({
+      date:i[0].value, school, prog:i[2].value,
+      start:i[3].value, end:i[4].value,
+      trainers:[t1,t2,t3].filter(Boolean)
+    });
+  });
+  return rows;
+}
+
+function fmtDate(ds) {
+  if(!ds) return '';
+  const d = new Date(ds+'T00:00:00');
+  return `${DAYS[d.getDay()]} ${d.getDate()}/${d.getMonth()+1}`;
+}
+
+function generateMessages() {
+  const rows = getRows();
+  const week = document.getElementById('week-label').value||'this week';
+  const sender = document.getElementById('sender-name').value||'inwardBOUND';
+  const out = document.getElementById('output');
+
+  if(!rows.length){out.innerHTML='<div class="empty">No sessions entered yet. Add sessions above.</div>';return;}
+
+  const byT = {};
+  rows.forEach(r => r.trainers.forEach(t => { if(!byT[t]) byT[t]=[]; byT[t].push(r); }));
+
+  let html = '<div style="margin-bottom:8px;font-size:13px;color:#555;font-weight:bold;">Messages — '+Object.keys(byT).length+' trainers</div>';
+
+  Object.entries(byT).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([trainer, ts]) => {
+    const contact = CONTACTS[trainer]||'';
+    const lines = ts
+      .sort((a,b)=>(a.date||'')>(b.date||'')?1:-1)
+      .map(s => {
+        const abbr = ABBR[s.school]||s.school;
+        const time = s.start ? `${s.start}${s.end?'–'+s.end:''}` : '';
+        const day = fmtDate(s.date);
+        const parts = [day,time,abbr,s.prog?'('+s.prog+')':''].filter(Boolean);
+        return '  • '+parts.join('  ');
+      }).join('\n');
+
+    const msg = `Hi ${trainer}! 👋\n\nHere is your schedule for *${week}*:\n\n${lines}\n\nPlease confirm receipt. Thank you! 🙏\n\n— ${sender}`;
+    const waUrl = contact ? `https://wa.me/65${contact}?text=${encodeURIComponent(msg)}` : '';
+    const msgEsc = msg.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+    html += `<div class="trainer-card">
+      <div class="trainer-header">
+        <div>
+          <div class="trainer-name">${trainer} <span class="badge">${ts.length} session${ts.length>1?'s':''}</span></div>
+          <div class="trainer-sub">${contact?'+65 '+contact:'No contact saved'}</div>
+        </div>
+        <div class="header-btns">
+          ${waUrl?`<a class="wa-btn" href="${waUrl}" target="_blank">Open in WhatsApp ↗</a>`:''}
+          <button class="copy-btn" onclick="copyMsg(this,\`${msg.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$')}\`)">Copy</button>
+        </div>
+      </div>
+      <div class="message-body">${msgEsc}</div>
+    </div>`;
+  });
+
+  out.innerHTML = html;
+}
+
+function copyMsg(btn, text) {
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='Copied ✓';btn.classList.add('done');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('done');},2000);
+  });
+}
+
+function clearAll() {
+  if(confirm('Clear all sessions?')) {
+    document.getElementById('session-rows').innerHTML='';
+    document.getElementById('output').innerHTML='';
+    addRow();addRow();addRow();
+  }
+}
+
+// Start with 5 empty rows
+addRow();addRow();addRow();addRow();addRow();
+</script>
+</body>
+</html>
